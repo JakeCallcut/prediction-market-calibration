@@ -1,9 +1,12 @@
-class GammaMarket():
+import json
+
+
+class GammaMarket:
 
     def __init__(self, raw):
         self.raw = raw
 
-    #Direct Properties
+    # Direct properties
 
     @property
     def question(self):
@@ -11,21 +14,25 @@ class GammaMarket():
 
     @property
     def outcomes(self):
-        return self.raw.get("outcomes")
+        return json.loads(self.raw.get("outcomes") or "[]")
 
     @property
     def outcomePrices(self):
-        return self.raw.get("outcomePrices")
+        return [float(p) for p in json.loads(self.raw.get("outcomePrices") or "[]")]
 
     @property
     def resolved(self):
         return self.raw.get("umaResolutionStatus") == "resolved"
 
     @property
-    def clobIds(self):
-        return self.raw.get("clobTokenIds")
+    def closedTime(self):
+        return self.raw.get("closedTime")
 
-    # Derived Properties
+    @property
+    def clobIds(self):
+        return json.loads(self.raw.get("clobTokenIds") or "[]")
+
+    # Derived properties
 
     @property
     def winning_index(self):
@@ -45,4 +52,3 @@ class GammaMarket():
         i = self.winning_index
         tokens = self.clobIds
         return tokens[i] if i is not None and i < len(tokens) else None
-
