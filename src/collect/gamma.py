@@ -3,7 +3,7 @@ from data_models.gammaMarket import GammaMarket
 
 GAMMA_BASE = "https://gamma-api.polymarket.com/markets"
 
-def FetchMarkets(n: int) -> list[GammaMarket]:
+def FetchGammaMarkets(n: int) -> list[GammaMarket]:
     markets = []
     offset = 0
     while len(markets) < n:
@@ -24,6 +24,6 @@ def FetchMarkets(n: int) -> list[GammaMarket]:
 
 
 if __name__ == "__main__":
-    markets = FetchMarkets(1000)
+    markets = FetchGammaMarkets(1000)
     for m in markets:
         print(m.question, m.outcomes, "->", m.winning_outcome, "resolved", m.resolved, "at", m.closedTime)

@@ -1,9 +1,18 @@
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 CLOB_BASE = "https://clob.polymarket.com/prices-history"
+HORIZONS = {
+    "1h": timedelta(hours=1),
+    "1d": timedelta(days=1),
+    "1w": timedelta(weeks=1),
+}
 
-def price_at(token_id, target_dt, fidelity=720):
+def get_horizon_times(resolved_dt: datetime):
+    resolved_dt = datetime.fromisoformat(resolved_dt)
+    return {name: resolved_dt - delta for name, delta in HORIZONS.items()}
+
+def get_price(token_id, target_dt, fidelity=720):
     r = requests.get(CLOB_BASE,
                      params={"market": token_id, "interval": "max",
                              "fidelity": fidelity}, timeout=15)
@@ -16,8 +25,6 @@ def price_at(token_id, target_dt, fidelity=720):
     pt = past[-1]
     return pt["p"], datetime.fromtimestamp(pt["t"], tz=timezone.utc)
 
-
-if __name__ == "__main__":
-    target = datetime(2026, 8, 20, tzinfo=timezone.utc)
-    print(price_at(token_id="17673566063898626336042894481556069170955440532229497731331809372288232441484", target_dt=target))
-
+def get_horizon_prices(id: str, resolved_dt: datetime):
+    times = get_horizon_times(resolved_dt)
+    return {name: get_price(id, dt) for name, dt in times.items()}
