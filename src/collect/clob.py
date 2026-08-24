@@ -6,6 +6,7 @@ HORIZONS = {
     "1h": timedelta(hours=1),
     "1d": timedelta(days=1),
     "1w": timedelta(weeks=1),
+    "1m": timedelta(weeks=4),
 }
 
 def get_horizon_times(resolved_dt: datetime):
