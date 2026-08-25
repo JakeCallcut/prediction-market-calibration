@@ -1,6 +1,5 @@
 import json
 
-
 class GammaMarket:
 
     def __init__(self, raw):

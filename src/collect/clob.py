@@ -24,7 +24,7 @@ def get_price(token_id, target_dt, fidelity=720):
     if not past:
         return None            # no data before that moment; drop this market
     pt = past[-1]
-    return pt["p"], datetime.fromtimestamp(pt["t"], tz=timezone.utc)
+    return pt["p"]
 
 def get_horizon_prices(id: str, resolved_dt: datetime):
     times = get_horizon_times(resolved_dt)

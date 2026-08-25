@@ -1,9 +1,9 @@
-import requests
 from data_models.gammaMarket import GammaMarket
+import requests
 
 GAMMA_BASE = "https://gamma-api.polymarket.com/markets"
 
-def FetchGammaMarkets(n: int) -> list[GammaMarket]:
+def get_gamma_markets(n: int) -> list[GammaMarket]:
     markets = []
     offset = 0
     while len(markets) < n:
@@ -24,6 +24,6 @@ def FetchGammaMarkets(n: int) -> list[GammaMarket]:
 
 
 if __name__ == "__main__":
-    markets = FetchGammaMarkets(1000)
+    markets = get_gamma_markets(1000)
     for m in markets:
         print(m.question, m.outcomes, "->", m.winning_outcome, "resolved", m.resolved, "at", m.closedTime)
