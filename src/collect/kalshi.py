@@ -22,6 +22,6 @@ def fetch_kalshi_markets(n: int) -> list[KalshiMarket]:
     return markets[:n]
 
 if __name__ == "__main__":
-    markets = fetch_kalshi_markets(1000)
+    markets = fetch_kalshi_markets(10000)
     for m in markets:
         print(f"{m.title} -> {m.result} at {m.closedTime}")
