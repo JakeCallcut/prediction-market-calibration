@@ -1,17 +1,19 @@
 from collect.clob import get_clob_horizon_prices
-from collect.gamma import get_gamma_markets
-from collect.kalshi import fetch_kalshi_markets, get_kalshi_horizon_prices
+from collect.gamma import get_top_gamma_markets
+from collect.kalshi import get_top_kalshi_markets, get_kalshi_horizon_prices
 import pandas as pd
 
 def fetch_data(num_markets:int = 5000):
 
+    k_nseries = 10
+    k_nmarkets = num_markets // k_nseries
     gamma_df = pd.DataFrame()
     kalshi_df = pd.DataFrame()
 
     print("🔹Fetching Polymarket markets...\n")
-    gammas = get_gamma_markets(num_markets)
+    gammas = get_top_gamma_markets(num_markets)
     print("❇️Fetching Kalshi markets...\n")
-    kalshis = fetch_kalshi_markets(num_markets)
+    kalshis = get_top_kalshi_markets(num_markets, k_nseries, k_nmarkets)
 
     print("🔹Calculating Polymarket horizon prices...\n")
     for m in gammas:

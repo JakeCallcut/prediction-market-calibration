@@ -12,21 +12,52 @@ HORIZONS = {
     "1m": timedelta(weeks=4),
 }
 
-def fetch_kalshi_markets(n: int) -> list[KalshiMarket]:
-    markets, cursor = [], None
-    while len(markets) < n:
-        params = {"limit": 1000, "status": "settled", "mve_filter": "exclude"}
-        if cursor:
-            params["cursor"] = cursor
-        r = requests.get(f"{KALSHI_BASE}/markets", params=params, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-        batch = data.get("markets", [])
-        if not batch:
-            break
-        markets.extend(KalshiMarket(raw) for raw in batch)
-        cursor = data.get("cursor")
-        if not cursor:
+def _lifespan_ok(raw, min_life):
+    o, c = raw.get("open_time"), raw.get("close_time")
+    if not o or not c:
+        return False
+    try:
+        o = datetime.fromisoformat(o.replace("Z", "+00:00"))
+        c = datetime.fromisoformat(c.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return (c - o) >= min_life
+
+def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: timedelta = timedelta(weeks=5)) -> list[KalshiMarket]:
+
+    # rank series by volume, high first
+    sp = {"include_volume": "true", "limit": 200}
+    r = requests.get(f"{KALSHI_BASE}/series", params=sp, timeout=10)
+    r.raise_for_status()
+    series = r.json().get("series", [])
+    series.sort(key=lambda s: float(s.get("volume") or s.get("volume_fp") or 0),
+                reverse=True)
+
+    #walk top series, pulling their settled markets until we have n
+    markets = []
+    for s in series[:n_series]:
+        ticker = s.get("ticker") or s.get("series_ticker")
+        if not ticker:
+            continue
+        cursor = None
+        pulled = 0
+        while pulled < per_series and len(markets) < n:
+            params = {"series_ticker": ticker, "status": "settled",
+                      "mve_filter": "exclude", "limit": 1000}
+            if cursor:
+                params["cursor"] = cursor
+            mr = requests.get(f"{KALSHI_BASE}/markets", params=params, timeout=10)
+            mr.raise_for_status()
+            data = mr.json()
+            batch = data.get("markets", [])
+            if not batch:
+                break
+            markets.extend(KalshiMarket(raw) for raw in batch if _lifespan_ok(raw, min_life))
+            pulled += len(batch)
+            cursor = data.get("cursor")
+            if not cursor:
+                break
+        if len(markets) >= n:
             break
     return markets[:n]
 
@@ -58,14 +89,17 @@ def price_at(candles, target_dt):
     if not past:
         return None
     c = past[-1]
-    return _price(c), datetime.fromtimestamp(c["end_period_ts"], tz=timezone.utc)
+    return _price(c)
 
 def get_kalshi_horizon_prices(market, resolved_dt):
-    resolved_dt = datetime.fromisoformat(resolved_dt)
+    if isinstance(resolved_dt, str):
+        resolved_dt = datetime.fromisoformat(resolved_dt.replace("Z", "+00:00"))
     earliest = resolved_dt - max(HORIZONS.values())
     candles = fetch_candles(
         market.series, market.ticker,
-        int(earliest.timestamp())
+        int(earliest.timestamp()),
+        int(resolved_dt.timestamp()),      # <- the missing end_ts
+        period_interval=60,
     )
     return {name: price_at(candles, resolved_dt - delta)
             for name, delta in HORIZONS.items()}

@@ -3,7 +3,7 @@ import requests
 
 GAMMA_BASE = "https://gamma-api.polymarket.com/markets"
 
-def get_gamma_markets(n: int) -> list[GammaMarket]:
+def get_top_gamma_markets(n: int) -> list[GammaMarket]:
     markets = []
     offset = 0
     while len(markets) < n:
@@ -11,7 +11,7 @@ def get_gamma_markets(n: int) -> list[GammaMarket]:
             "limit": 100,
             "offset": offset,
             "closed": "true",
-            "order": "endDate",
+            "order": "volumeNum",
             "ascending": "false",
         }, timeout=10)
         r.raise_for_status()
@@ -24,6 +24,6 @@ def get_gamma_markets(n: int) -> list[GammaMarket]:
 
 
 if __name__ == "__main__":
-    markets = get_gamma_markets(1000)
+    markets = get_top_gamma_markets(1000)
     for m in markets:
         print(m.question, m.outcomes, "->", m.winning_outcome, "resolved", m.resolved, "at", m.closedTime)
