@@ -6,6 +6,14 @@ class KalshiMarket:
         self.raw = raw
 
     @property
+    def ticker(self):
+        return self.raw.get("ticker")
+
+    @property
+    def series(self):
+        return self.ticker.split("-")[0]
+
+    @property
     def title(self):
         return self.raw.get("title")
 

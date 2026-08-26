@@ -26,6 +26,6 @@ def get_price(token_id, target_dt, fidelity=720):
     pt = past[-1]
     return pt["p"]
 
-def get_horizon_prices(id: str, resolved_dt: datetime):
+def get_clob_horizon_prices(id: str, resolved_dt: datetime):
     times = get_horizon_times(resolved_dt)
     return {name: get_price(id, dt) for name, dt in times.items()}
