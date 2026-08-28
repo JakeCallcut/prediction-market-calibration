@@ -1,5 +1,9 @@
+#Polymarket's CLOB API interface
+#Contains functions to get historical prices for a market given its CLOB ID
+#to be used in conjuction with the Gamma interface
+
 import requests
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 CLOB_BASE = "https://clob.polymarket.com/prices-history"
 HORIZONS = {
@@ -29,3 +33,6 @@ def get_price(token_id, target_dt, fidelity=720):
 def get_clob_horizon_prices(id: str, resolved_dt: datetime):
     times = get_horizon_times(resolved_dt)
     return {name: get_price(id, dt) for name, dt in times.items()}
+
+if __name__ == "__main__":
+    pass

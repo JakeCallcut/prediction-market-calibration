@@ -1,3 +1,7 @@
+#Polymarket's Gamma API Interface
+#Contains function to get N top markets from polymarket
+#run as main to fetch and print 10 markets
+
 from data_models.gammaMarket import GammaMarket
 import requests
 
@@ -24,6 +28,6 @@ def get_top_gamma_markets(n: int) -> list[GammaMarket]:
 
 
 if __name__ == "__main__":
-    markets = get_top_gamma_markets(1000)
+    markets = get_top_gamma_markets(10)
     for m in markets:
-        print(m.question, m.outcomes, "->", m.winning_outcome, "resolved", m.resolved, "at", m.closedTime)
+        print(m.question, m.outcomes, "->", m.winning_outcome, "resolved at", m.closedTime)

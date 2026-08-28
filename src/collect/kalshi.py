@@ -1,7 +1,10 @@
+#Kalshi API Interface
+#Contains interaction functions to get kalshi markets and prices
+#Run as main to fetch and print 10 markets
+
 from data_models.kalshiMarket import KalshiMarket
 from datetime import datetime, timedelta, timezone
 import requests
-
 
 KALSHI_BASE = "https://external-api.kalshi.com/trade-api/v2"
 
@@ -105,18 +108,6 @@ def get_kalshi_horizon_prices(market, resolved_dt):
             for name, delta in HORIZONS.items()}
 
 if __name__ == "__main__":
-    pass
-    # markets = fetch_kalshi_markets(10)
-    # m = markets[0]
-    # resolved = datetime.fromisoformat(m.closedTime) if isinstance(m.closedTime, str) else m.closedTime
-    # start = int((resolved - timedelta(days=30)).timestamp())
-    # end = int(resolved.timestamp())
-    #
-    # url = f"{KALSHI_BASE}/series/{m.series}/markets/{m.ticker}/candlesticks"
-    # print("series:", m.series, "ticker:", m.ticker)
-    # print("url:", url)
-    # r = requests.get(url, params={"start_ts": start, "end_ts": end,
-    #                               "period_interval": 60,
-    #                               "include_latest_before_start": "true"}, timeout=15)
-    # print("status:", r.status_code)
-    # print("body:", r.text[:400])
+    markets = get_top_kalshi_markets(10)
+    for m in markets:
+        print(m.title, "->", m.result, "resolved at:", m.closedTime)
