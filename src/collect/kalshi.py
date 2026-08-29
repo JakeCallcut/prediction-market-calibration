@@ -26,7 +26,7 @@ def _lifespan_ok(raw, min_life):
         return False
     return (c - o) >= min_life
 
-def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: timedelta = timedelta(weeks=5)) -> list[KalshiMarket]:
+def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: timedelta = timedelta(weeks=4)) -> list[KalshiMarket]:
 
     # rank series by volume, high first
     sp = {"include_volume": "true", "limit": 200}
