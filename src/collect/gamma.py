@@ -30,4 +30,4 @@ def get_top_gamma_markets(n: int) -> list[GammaMarket]:
 if __name__ == "__main__":
     markets = get_top_gamma_markets(10)
     for m in markets:
-        print(m.question, m.outcomes, "->", m.winning_outcome, "resolved at", m.closedTime)
+        print(m.question, m.outcomes, "->", m.winning_outcome, m.winning_index, "resolved at", m.closedTime)

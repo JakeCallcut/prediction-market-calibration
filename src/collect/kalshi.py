@@ -108,6 +108,7 @@ def get_kalshi_horizon_prices(market, resolved_dt):
             for name, delta in HORIZONS.items()}
 
 if __name__ == "__main__":
-    markets = get_top_kalshi_markets(10)
+    markets = get_top_kalshi_markets(10, 2, 5)
     for m in markets:
-        print(m.title, "->", m.result, "resolved at:", m.closedTime)
+        print(m)
+        #print(m.title, "->", m.result, "resolved at:", m.closedTime)
