@@ -4,16 +4,8 @@
 
 from data_models.kalshiMarket import KalshiMarket
 from datetime import datetime, timedelta, timezone
+from src import config
 import requests
-
-KALSHI_BASE = "https://external-api.kalshi.com/trade-api/v2"
-
-HORIZONS = {
-    "1h": timedelta(hours=1),
-    "1d": timedelta(days=1),
-    "1w": timedelta(weeks=1),
-    "1m": timedelta(weeks=4),
-}
 
 def _lifespan_ok(raw, min_life):
     o, c = raw.get("open_time"), raw.get("close_time")
@@ -30,7 +22,7 @@ def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: tim
 
     # rank series by volume, high first
     sp = {"include_volume": "true", "limit": 200}
-    r = requests.get(f"{KALSHI_BASE}/series", params=sp, timeout=10)
+    r = requests.get(f"{config.KALSHI_BASE}/series", params=sp, timeout=10)
     r.raise_for_status()
     series = r.json().get("series", [])
     series.sort(key=lambda s: float(s.get("volume") or s.get("volume_fp") or 0),
@@ -49,7 +41,7 @@ def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: tim
                       "mve_filter": "exclude", "limit": 1000}
             if cursor:
                 params["cursor"] = cursor
-            mr = requests.get(f"{KALSHI_BASE}/markets", params=params, timeout=10)
+            mr = requests.get(f"{config.KALSHI_BASE}/markets", params=params, timeout=10)
             mr.raise_for_status()
             data = mr.json()
             batch = data.get("markets", [])
@@ -77,7 +69,7 @@ def _price(candle):
     return float(bid) if bid is not None else (float(ask) if ask is not None else None)
 
 def fetch_candles(series, ticker, start_ts, end_ts, period_interval=60):
-    url = f"{KALSHI_BASE}/series/{series}/markets/{ticker}/candlesticks"
+    url = f"{config.KALSHI_BASE}/series/{series}/markets/{ticker}/candlesticks"
     r = requests.get(url, params={
         "start_ts": start_ts, "end_ts": end_ts,
         "period_interval": period_interval,
@@ -97,7 +89,7 @@ def price_at(candles, target_dt):
 def get_kalshi_horizon_prices(market, resolved_dt):
     if isinstance(resolved_dt, str):
         resolved_dt = datetime.fromisoformat(resolved_dt.replace("Z", "+00:00"))
-    earliest = resolved_dt - max(HORIZONS.values())
+    earliest = resolved_dt - max(config.HORIZONS.values())
     candles = fetch_candles(
         market.series, market.ticker,
         int(earliest.timestamp()),
@@ -105,7 +97,7 @@ def get_kalshi_horizon_prices(market, resolved_dt):
         period_interval=60,
     )
     return {name: price_at(candles, resolved_dt - delta)
-            for name, delta in HORIZONS.items()}
+            for name, delta in config.HORIZONS.items()}
 
 if __name__ == "__main__":
     markets = get_top_kalshi_markets(10, 2, 5)

@@ -3,15 +3,14 @@
 #run as main to fetch and print 10 markets
 
 from data_models.gammaMarket import GammaMarket
+from src import config
 import requests
-
-GAMMA_BASE = "https://gamma-api.polymarket.com/markets"
 
 def get_top_gamma_markets(n: int) -> list[GammaMarket]:
     markets = []
     offset = 0
     while len(markets) < n:
-        r = requests.get(GAMMA_BASE, params={
+        r = requests.get(config.GAMMA_BASE, params={
             "limit": 100,
             "offset": offset,
             "closed": "true",

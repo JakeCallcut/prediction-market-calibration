@@ -4,6 +4,7 @@
 from collect.clob import get_clob_horizon_prices
 from collect.gamma import get_top_gamma_markets
 from collect.kalshi import get_top_kalshi_markets, get_kalshi_horizon_prices
+from src import config
 import pandas as pd
 from pathlib import Path
 
@@ -47,9 +48,5 @@ def fetch_data(num_markets:int = 100):
     return df
 
 if __name__ == "__main__":
-    DATA_PATH = Path("../../data/raw/")
     df = fetch_data(500)
-    df.to_csv(DATA_PATH / "market_data.csv", index=False)
-
-    #TODO: fix output to give yes/no or 0/1
-    #TODO: get rid of scalar values
+    df.to_csv(config.RAW_DATA_PATH / "market_data.csv", index=False)

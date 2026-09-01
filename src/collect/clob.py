@@ -4,21 +4,14 @@
 
 import requests
 from datetime import datetime, timedelta
-
-CLOB_BASE = "https://clob.polymarket.com/prices-history"
-HORIZONS = {
-    "1h": timedelta(hours=1),
-    "1d": timedelta(days=1),
-    "1w": timedelta(weeks=1),
-    "1m": timedelta(weeks=4),
-}
+from src import config
 
 def get_horizon_times(resolved_dt: datetime):
     resolved_dt = datetime.fromisoformat(resolved_dt)
-    return {name: resolved_dt - delta for name, delta in HORIZONS.items()}
+    return {name: resolved_dt - delta for name, delta in config.HORIZONS.items()}
 
 def get_price(token_id, target_dt, fidelity=720):
-    r = requests.get(CLOB_BASE,
+    r = requests.get(config.CLOB_BASE,
                      params={"market": token_id, "interval": "max",
                              "fidelity": fidelity}, timeout=15)
     r.raise_for_status()
