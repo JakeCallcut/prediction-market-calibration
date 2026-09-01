@@ -11,7 +11,7 @@ def clean_data():
     df = pd.read_csv(config.RAW_DATA_PATH / "market_data.csv")
     df = df.dropna()
     df = df.drop(df[df['outcome'] == "scalar"].index)
-    df = df.replace({"outcome": {"yes": 0, "no": 1}})
+    df = df.replace({"outcome": {"yes": 1, "no": 0}})
 
     #split dataframe by source platform
     df_polymarket = df[df['source'] == 'polymarket']
