@@ -1,24 +1,32 @@
 #Script to provide a function fetch N markets from both Kalshi and Polymarket
-#
 
 from collect.clob import get_clob_horizon_prices
 from collect.gamma import get_top_gamma_markets
 from collect.kalshi import get_top_kalshi_markets, get_kalshi_horizon_prices
 from src import config
+
 import pandas as pd
-from pathlib import Path
 
-def fetch_data(num_markets:int = 100):
+def fetch_data(num_markets:int = 100) -> pd.DataFrame:
+    """
+    Complete wrapping function to fetch market data,
+    Uses CLOB, Gamma, and Kalshi APIs.
 
+    Returns a pandas DataFrame with columns: source, question, horizon, forecast, outcome
+    """
+
+    #initialise vars for kalshi
     nseries = 100
     nmarkets = num_markets // nseries
     entries = []
 
+    #fetch the top markets from both platforms into a list
     print("🔹Fetching Polymarket markets...\n")
     gammas = get_top_gamma_markets(num_markets)
     print("❇️Fetching Kalshi markets...\n")
     kalshis = get_top_kalshi_markets(num_markets, nseries, nmarkets)
 
+    #Build a dict with polymarket APIs and append the dict, as a row to the entries list
     print("🔹Resolving Polymarket horizons...\n")
     for i, m in enumerate(gammas):
         y = 1 if m.winning_outcome == "Yes" else 0 if m.winning_outcome == "No" else None
@@ -31,6 +39,7 @@ def fetch_data(num_markets:int = 100):
             entries.append({"source": "polymarket", "question": m.question, "horizon": horizon, "forecast": price, "outcome": y})
         print(f"🔹Resolved Market {i}/{num_markets}: {m.question}: {m.winning_outcome}")
 
+    #Build a dict with Kalshi API and append the dict, as a row to the entries list
     print("❇️Resolving Kalshi horizons...\n")
     for i, m in enumerate(kalshis):
         y = m.result
@@ -44,6 +53,7 @@ def fetch_data(num_markets:int = 100):
                          "horizon": horizon, "forecast": price, "outcome": y})
         print(f"❇️Resolved Market {i}/{num_markets}: {m.title}: {m.result}")
 
+    #change the list to rows of a dataframe and return it
     df = pd.DataFrame(entries)
     return df
 

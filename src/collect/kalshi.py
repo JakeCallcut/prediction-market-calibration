@@ -7,7 +7,8 @@ from datetime import datetime, timedelta, timezone
 from src import config
 import requests
 
-def _lifespan_ok(raw, min_life):
+def _lifespan_ok(raw, min_life) -> bool:
+    """Helper function to check if a kalshi market has a lifetime of `min_life`"""
     o, c = raw.get("open_time"), raw.get("close_time")
     if not o or not c:
         return False
@@ -19,7 +20,7 @@ def _lifespan_ok(raw, min_life):
     return (c - o) >= min_life
 
 def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: timedelta = timedelta(weeks=4)) -> list[KalshiMarket]:
-
+    """Fetch the top n kalshi markets, with a lifetime of over `min_life`"""
     # rank series by volume, high first
     sp = {"include_volume": "true", "limit": 200}
     r = requests.get(f"{config.KALSHI_BASE}/series", params=sp, timeout=10)
@@ -56,7 +57,8 @@ def get_top_kalshi_markets(n: int, n_series: int, per_series: int, min_life: tim
             break
     return markets[:n]
 
-def _price(candle):
+def _price(candle) -> float | None:
+    """Helper function to extract a price from a candle, falling back to average of bid and ask price if no trades"""
     p = candle.get("price", {})
     v = p.get("close_dollars")
     if v is not None:
@@ -87,6 +89,7 @@ def price_at(candles, target_dt):
     return _price(c)
 
 def get_kalshi_horizon_prices(market, resolved_dt):
+    """Return a list of kalshi market prices for each time horizon in config"""
     if isinstance(resolved_dt, str):
         resolved_dt = datetime.fromisoformat(resolved_dt.replace("Z", "+00:00"))
     earliest = resolved_dt - max(config.HORIZONS.values())

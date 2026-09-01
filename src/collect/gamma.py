@@ -7,8 +7,11 @@ from src import config
 import requests
 
 def get_top_gamma_markets(n: int) -> list[GammaMarket]:
+    """return top n gamma market data"""
     markets = []
     offset = 0
+
+    #in batches of 100, keep fetching and appending markets to list until n has been reached
     while len(markets) < n:
         r = requests.get(config.GAMMA_BASE, params={
             "limit": 100,

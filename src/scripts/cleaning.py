@@ -1,11 +1,11 @@
 #Simple script to clean the raw market data and save to a modelling table
 #run as main to clean
 
-import pandas as pd
 from src import config
-from pathlib import Path
+import pandas as pd
 
 def clean_data():
+    """cleant the data at the raw path in config, save the modlling table and platform split tables"""
 
     #Drop NA rows, scalar rows, and change yes/no to 0/1
     df = pd.read_csv(config.RAW_DATA_PATH / "market_data.csv")
