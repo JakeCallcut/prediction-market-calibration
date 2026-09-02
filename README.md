@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-    <img src="./public/k_logo.png" alt="Kalshi" width="160" />
+    <a href="https://kalshi.com"><img src="./public/k_logo.png" alt="Kalshi" width="160" /></a>
     <br />
     <br />
-    <img src="./public/pm_logo.png" alt="Polymarket" width="240" />
+    <a href="https://polymarket.com"><img src="./public/pm_logo.png" alt="Polymarket" width="240" /></a>
 </p>
 
 Research Tooling for evaluation of prediction markets, including probabalistic calibration and market consistency. Prediction markets are unique platforms where traders buy and sell contracts based on the outcomes of future events. The prices of these contracts can be interpreted as the collective probability estimates of the market participants regarding those events.
@@ -55,3 +55,33 @@ prediction-market-calibration/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
+## Installation and Setup
+
+Clone and install requirements:
+```bash
+git clone https://github.com/JakeCallcut/prediction-market-calibration.git
+cd prediction-market-calibration
+
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+Run the pipeline:
+```bash
+cat src/config.py   #you can change the time horizons and number of markets if you like
+                    #Defaults are 100 markets, 1 hour, 1 day, 1 week, 1 month horizons
+python -m src.main
+```
+
+## Conclusions
+As of September 2026, cross both markets studied, we find that they are broadly well calibrated. 
+In each of the time horizons, the markets' reliability points are closely tracking the 45-degree line, indicating that the market prices are generally consistent with the actual outcomes.
+There is a clear pattern on Brier score degredation over time, with the markets showing better calibration for shorter-term events compared to longer-term events. This suggests that traders are more accurate in predicting near-term outcomes, while uncertainty increases for events further in the future.
+
+Polymarket's Brier score rises from 0.026 at 1 hour to 0.037 (1 day), 0.057 (1 week) and 0.066 (1 month), Kalshi's rises from 0.163 to 0.172 to 0.179 over the same horizons. This is the expected behaviour as the horizon of an uncertain event approaches, the outcome becomes more predictable.
+
+There is a noticable difference in the Brier scores between the two platforms, with Polymarket consistently showing lower scores (better calibration) than Kalshi across all time horizons. This is likely not because Polymarket is somehow a better predictor of future events.
+Rather because of the nature of the events listed on the platforms, Polymarket tends towards longshots or favourites where the market is more confident in the outcome, whereas Kalshi has more sports-betting events with more uncertainty. This is reflected in the distribution of probabilities, with Polymarket having a higher concentration of probabilities near 0 and 1, while Kalshi has a more uniform distribution across the probability spectrum.
